@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشق شعر</title>
+    <style>
+        :root {
+            --bg-main: #121214;
+            --bg-card: #1a1a1e;
+            --accent: #3b9eff;
+            --accent-dim: #1e3a5f;
+            --text-main: #f0f0f4;
+            --text-muted: #8a8a93;
+            --border: #2a2a30;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        h1 { font-size: 1.5rem; font-weight: 700; }
+
+        button {
+            background-color: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background-color: var(--accent);
+            color: var(--bg-main);
+        }
+
+        .btn-danger {
+            background-color: #3a1e1e;
+            color: #ff5555;
+            border-color: #ff5555;
+        }
+        .btn-danger:hover {
+            background-color: #ff5555;
+            color: var(--bg-main);
+        }
+
+        .btn-secondary {
+            background-color: #2a2a30;
+            color: var(--text-main);
+            border-color: var(--border);
+        }
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .selector-wrapper { margin-bottom: 30px; }
+
+	select {
+            width: 100%;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 8px;
+            font-size: 1.1rem;
+	    line-height: 1.8;
+            outline: none;
+            cursor: pointer;
+
+            /* 1. Hide the default browser arrow */
+            appearance: none;
+            -webkit-appearance: none;
+            
+            /* 2. Custom Padding: Top Right Bottom Left */
+            /* 16px on the right fixes your cutoff issue. 40px on the left makes room for the arrow! */
+            padding: 16px 16px 16px 40px;
+
+            /* 3. Add custom simple white SVG arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 12px center; /* Positions arrow on the left */
+            background-size: 18px; /* Size of the arrow */
+        }
+
+
+
+
+        optgroup {
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-weight: bold;
+            font-style: normal;
+        }
+        
+        option {
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-weight: normal;
+        }
+
+        /* Reading Area is now clickable! */
+        .poem-display {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: flex-start;
+            cursor: pointer; /* Shows it's interactive */
+            -webkit-tap-highlight-color: transparent; /* Removes ugly blue flash on mobile tap */
+            user-select: none; /* Prevents selecting text if you tap too fast */
+            -webkit-user-select: none;
+        }
+
+        .poem-line {
+            font-size: 1.7rem;
+            font-weight: 600;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .poem-line.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .poem-line.newly-revealed {
+            color: var(--accent);
+        }
+
+        /* Updated Vertical Controls Bar */
+        .controls-bar {
+            display: flex;
+            flex-direction: column; /* Stacks buttons vertically */
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+        }
+
+        .control-btn {
+            width: 100%; /* Full width */
+            padding: 18px 10px; /* Taller, easier to tap */
+            font-size: 1.15rem;
+            background-color: #2a2a30;
+            color: var(--text-main);
+            border-color: #444;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .control-btn:hover {
+            background-color: #444;
+            color: #fff;
+        }
+
+        .control-btn.primary {
+            background-color: var(--accent-dim);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .control-btn.primary:hover {
+            background-color: var(--accent);
+            color: var(--bg-main);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label { color: var(--text-muted); font-size: 0.95rem; font-weight: 500; }
+
+        input[type="text"], textarea {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            outline: none;
+            width: 100%;
+        }
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--accent);
+        }
+
+        textarea { height: 200px; resize: vertical; line-height: 1.7; }
+
+        .backup-zone {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .poem-list {
+            margin-top: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .poem-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+
+        .poem-item-title { font-weight: 600; font-size: 1.1rem; }
+        .actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+        footer {
+            margin-top: auto;
+            padding-top: 40px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            line-height: 1.8;
+        }
+        
+        .desktop-hint kbd {
+            background: #2a2a30;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.85rem;
+            color: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            header { flex-direction: column; gap: 15px; }
+            .poem-line { font-size: 1.3rem; }
+            .actions { flex-direction: column; }
+            .poem-item { flex-direction: column; align-items: flex-start; }
+            .poem-item-title { margin-bottom: 10px; }
+            .desktop-hint { display: none; }
+        }
+
+
+/* Modern Standard (Firefox) */
+textarea {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) var(--bg-main);
+}
+
+/* WebKit (Chrome, Safari, Edge, etc.) */
+textarea::-webkit-scrollbar {
+    width: 12px;
+}
+
+textarea::-webkit-scrollbar-track {
+    background: var(--bg-main);
+    border-radius: 8px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 8px;
+    /* This creates a nice margin around the thumb so it isn't completely flush */
+    border: 3px solid var(--bg-main); 
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-muted);
+}
+
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 id="app-title">مشق شعر</h1>
+        <button id="toggle-view-btn" onclick="toggleView()">مدیریت شعرها</button>
+    </header>
+
+    <main class="container">
+        <div id="study-view" class="view active">
+            <div class="selector-wrapper">
+                <select id="poem-selector" onchange="loadSelectedPoem()"></select>
+            </div>
+            
+            <div class="poem-display" id="poem-display-area" onclick="triggerNextLine()"></div>
+
+            <div class="controls-bar">
+		<!-- button for next line...
+                <button class="control-btn primary" onclick="triggerNextLine()">خط بعدی / شعر بعدی (یا لمس صفحه)</button>
+		-->
+                <button class="control-btn" onclick="loadSelectedPoem()">شروع مجدد (Reset)</button>
+            </div>
+        </div>
+
+        <div id="manage-view" class="view">
+            <h2 style="margin-bottom: 20px; font-size: 1.3rem;">افزودن / ویرایش شعر</h2>
+            <input type="hidden" id="edit-index" value="-1">
+            
+            <div class="form-group">
+                <label>عنوان شعر / شاعر (Title / Author)</label>
+                <input type="text" id="poem-title" dir="auto" placeholder="مثلا: حافظ - غزل اول / Robert Frost">
+            </div>
+
+            <div class="form-group">
+                <label>متن شعر (هر مصرع یا بیت را در یک خط جداگانه وارد کنید)</label>
+                <textarea id="poem-content" dir="auto" placeholder="Line 1 of the poem&#10;Line 2 of the poem"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button onclick="savePoem()">ذخیره شعر</button>
+                <button class="btn-danger" onclick="clearForm()">انصراف</button>
+            </div>
+
+            <div class="backup-zone">
+                <button class="btn-secondary" onclick="exportData()">پشتیبان‌گیری (Export JSON)</button>
+                <button class="btn-secondary" onclick="document.getElementById('file-input').click()">بازیابی فایل (Import JSON)</button>
+                <input type="file" id="file-input" accept=".json" style="display:none" onchange="importData(event)">
+            </div>
+
+            <div class="poem-list" id="management-poem-list"></div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="desktop-hint">
+            راهنما: کلید <kbd>Space</kbd> خط بعدی | کلید <kbd>R</kbd> شروع مجدد<br>
+            کلیدهای جهت‌نما: <kbd>→</kbd> شعر بعدی | <kbd>←</kbd> شعر قبلی
+        </div>
+    </footer>
+
+    <script>
+        const defaultPoems = [
+            {
+                title: "مولوی - مثنوی",
+                dir: "rtl",
+                content: "بس دعاها که خلافست و هلاک\nکز کرم می نشنود یزدان پاک\nشکر ایزد کن که دعا مرودود شد\nما زیان پنداشتیم، آن سود شد\nمُصلِح است و مَصلحَت داند او\nآن دعا را بازمیگرداند او"
+            },
+            {
+                title: "Robert Frost - Fire and Ice",
+                dir: "ltr",
+                content: "Some say the world will end in fire,\nSome say in ice.\nFrom what I’ve tasted of desire\nI hold with those who favor fire."
+            }
+        ];
+
+        let poems = JSON.parse(localStorage.getItem('saved_poems_v3')) || defaultPoems;
+        let currentLineIndex = 0;
+        let totalLines = 0;
+        let isStudyMode = true;
+
+        function saveToStorage() {
+            localStorage.setItem('saved_poems_v3', JSON.stringify(poems));
+        }
+
+        function init() {
+            renderSelector();
+            renderManagementList();
+            loadSelectedPoem();
+        }
+
+        function detectDirection(text) {
+            const rtlRegex = /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/;
+            return rtlRegex.test(text) ? 'rtl' : 'ltr';
+        }
+
+        function renderSelector() {
+            const selector = document.getElementById('poem-selector');
+            const rtlPoems = [];
+            const ltrPoems = [];
+            
+            poems.forEach((p, i) => {
+                if (p.dir === 'rtl') rtlPoems.push({ ...p, originalIndex: i });
+                else ltrPoems.push({ ...p, originalIndex: i });
+            });
+
+            let html = '';
+            if (rtlPoems.length > 0) {
+                html += `<optgroup label="فارسی (Persian / RTL)">`;
+                html += rtlPoems.map(p => `<option value="${p.originalIndex}">${escapeHTML(p.title)}</option>`).join('');
+                html += `</optgroup>`;
+            }
+            if (ltrPoems.length > 0) {
+                html += `<optgroup label="English (LTR)" style="direction: ltr; text-align: left;">`;
+                html += ltrPoems.map(p => `<option value="${p.originalIndex}">${escapeHTML(p.title)}</option>`).join('');
+                html += `</optgroup>`;
+            }
+            selector.innerHTML = html;
+        }
+
+        function renderManagementList() {
+            const list = document.getElementById('management-poem-list');
+            if (poems.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">هیچ شعری ثبت نشده است.</p>';
+                return;
+            }
+            list.innerHTML = poems.map((p, i) => `
+                <div class="poem-item">
+                    <span class="poem-item-title">${escapeHTML(p.title)}</span>
+                    <div class="actions">
+                        <button onclick="editPoem(${i})">ویرایش</button>
+                        <button class="btn-danger" onclick="deletePoem(${i})">حذف</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadSelectedPoem() {
+            const selector = document.getElementById('poem-selector');
+            const displayArea = document.getElementById('poem-display-area');
+            displayArea.innerHTML = '';
+            currentLineIndex = 0;
+
+            if (poems.length === 0 || !selector.value) {
+                displayArea.innerHTML = '<p style="color: var(--text-muted); text-align: center;">لیست خالی است.</p>';
+                return;
+            }
+
+            const poem = poems[selector.value];
+            
+            displayArea.style.direction = poem.dir || 'rtl';
+            displayArea.style.textAlign = (poem.dir === 'ltr') ? 'left' : 'right';
+
+            const lines = poem.content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            totalLines = lines.length;
+
+            displayArea.innerHTML = lines.map((line, idx) => `
+                <div class="poem-line" id="line-${idx}">${escapeHTML(line)}</div>
+            `).join('');
+
+            if (totalLines > 0) {
+                document.getElementById('line-0').classList.add('visible');
+                currentLineIndex = 1;
+            }
+        }
+
+        function triggerNextLine() {
+            if (currentLineIndex < totalLines) {
+                const activeLine = document.querySelector('.poem-line.newly-revealed');
+                if (activeLine) activeLine.classList.remove('newly-revealed');
+
+                const nextLine = document.getElementById(`line-${currentLineIndex}`);
+                if (nextLine) {
+                    nextLine.classList.add('visible', 'newly-revealed');
+                    currentLineIndex++;
+                }
+            } else {
+                navigatePoem(1);
+            }
+        }
+
+        function toggleView() {
+            const btn = document.getElementById('toggle-view-btn');
+            const studyView = document.getElementById('study-view');
+            const manageView = document.getElementById('manage-view');
+
+            if (isStudyMode) {
+                studyView.classList.remove('active');
+                manageView.classList.add('active');
+                btn.innerText = 'بازگشت به تمرین';
+                isStudyMode = false;
+            } else {
+                manageView.classList.remove('active');
+                studyView.classList.add('active');
+                btn.innerText = 'مدیریت شعرها';
+                isStudyMode = true;
+                renderSelector();
+                loadSelectedPoem();
+            }
+        }
+
+        function savePoem() {
+            const titleInput = document.getElementById('poem-title');
+            const contentInput = document.getElementById('poem-content');
+            const editIndex = parseInt(document.getElementById('edit-index').value);
+
+            if (!titleInput.value.trim() || !contentInput.value.trim()) {
+                alert('لطفاً همه فیلدها را پر کنید.');
+                return;
+            }
+
+            const combinedText = titleInput.value + " " + contentInput.value;
+            const detectedDir = detectDirection(combinedText);
+
+            const poemObject = {
+                title: titleInput.value.trim(),
+                dir: detectedDir,
+                content: contentInput.value.trim()
+            };
+
+            if (editIndex > -1) {
+                poems[editIndex] = poemObject;
+            } else {
+                poems.push(poemObject);
+            }
+
+            saveToStorage();
+            renderManagementList();
+            clearForm();
+        }
+
+        function editPoem(index) {
+            const poem = poems[index];
+            document.getElementById('poem-title').value = poem.title;
+            document.getElementById('poem-content').value = poem.content;
+            document.getElementById('edit-index').value = index;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deletePoem(index) {
+            if (confirm('آیا از حذف این شعر اطمینان دارید؟')) {
+                poems.splice(index, 1);
+                saveToStorage();
+                renderManagementList();
+                renderSelector();
+                if(isStudyMode) loadSelectedPoem();
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('poem-title').value = '';
+            document.getElementById('poem-content').value = '';
+            document.getElementById('edit-index').value = '-1';
+        }
+
+        function navigatePoem(step) {
+            const selector = document.getElementById('poem-selector');
+            if (poems.length <= 1) return;
+            
+            const options = Array.from(selector.options).map(opt => opt.value);
+            const currentIndexInDropdown = options.indexOf(selector.value);
+            
+            let nextIndex = (currentIndexInDropdown + step + options.length) % options.length;
+            selector.value = options[nextIndex];
+            loadSelectedPoem();
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(poems, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "my_poems_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed)) {
+                        if (confirm('آیا مایلید این فایل جایگزین شعرهای فعلی شما شود؟')) {
+                            poems = parsed.map(p => ({
+                                ...p,
+                                dir: p.dir ? p.dir : detectDirection(p.title + " " + p.content)
+                            }));
+                            saveToStorage();
+                            init();
+                        }
+                    } else {
+                        alert('فرمت فایل نامعتبر است.');
+                    }
+                } catch (err) {
+                    alert('خطا در خواندن فایل JSON.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        document.onkeydown = function(e) {
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            if (!isStudyMode) return;
+
+            if (e.key === ' ' || e.code === 'Space') {
+                e.preventDefault();
+                triggerNextLine();
+            }
+
+            if (e.key === 'r' || e.key === 'R') {
+                loadSelectedPoem();
+            }
+
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                navigatePoem(1);
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                navigatePoem(-1);
+            }
+        };
+
+// --- Swipe Gesture Logic ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, {passive: true});
+
+        function handleSwipe() {
+            // Don't swipe if we are in the management view
+            if (!isStudyMode) return; 
+
+            const diffX = touchEndX - touchStartX;
+            const threshold = 50; // Minimum swipe distance in pixels
+
+            if (diffX > threshold) {
+                // Swiped Right (finger moved right)
+                navigatePoem(1); 
+            } else if (diffX < -threshold) {
+                // Swiped Left (finger moved left)
+                navigatePoem(-1);
+            }
+        }
+
+	// Helper function to prevent XSS
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
+
+        window.onload = init;
+    </script>
+</body>
+</html>
