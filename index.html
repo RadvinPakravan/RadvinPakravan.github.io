@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radvin Pakravan — Busy Growing Up</title>
+    <title>Radvin Pakravan</title>
     <meta name="description" content="Radvin Pakravan is a little adventurer, currently busy growing up. Come back in a few years to see how cool he becomes.">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Radvin Pakravan — Busy Growing Up">
@@ -20,7 +20,7 @@
             "@type": "Person",
             "name": "Radvin Pakravan",
             "alternateName": "رادوین پاکروان",
-            "description": "Radvin Pakravan is a young child, currently busy growing up and exploring the world. This is his placeholder website.",
+            "description": "Radvin Pakravan website.",
             "url": "https://radvinpakravan.ir"
         }
     </script>
@@ -327,13 +327,6 @@ h1 {
         const NAME_EN = "Radvin Pakravan";      // English name
         const NAME_FA = "رادوین پاکروان";       // Persian/Farsi name (transliteration)
 
-        // Skill data – easily adjustable percentages
-        const skills = [
-          { emoji: "🚶", label: "Walking", percent: 100 },
-          { emoji: "🔤", label: "ABCs", percent: 48 },
-          { emoji: "🔢", label: "Counting", percent: 26 },
-          { emoji: "🗣️", label: "Talking", percent: 8 },
-        ];
 
         // Update visible names
         document.getElementById('nameEn').textContent = NAME_EN;
@@ -341,22 +334,13 @@ h1 {
         hiddenFa.textContent = NAME_FA;
         hiddenFa.setAttribute('lang', 'fa');
 
-        // Update meta tags & title
-        document.title = `${NAME_EN} — Busy Growing Up`;
-        const metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc) metaDesc.setAttribute('content', `${NAME_EN} is a little adventurer, currently busy growing up. Come back in a few years to see how cool he becomes.`);
-        document.querySelector('meta[property="og:title"]')?.setAttribute('content', `${NAME_EN} — Busy Growing Up`);
-        document.querySelector('meta[property="og:description"]')?.setAttribute('content', `${NAME_EN} is busy growing up. Check back in a few years.`);
-        document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', `${NAME_EN} — Busy Growing Up`);
-        document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', `${NAME_EN} is currently learning, playing, and getting cooler every day.`);
-
         // Update JSON-LD
         const ldJson = {
           "@context": "https://schema.org",
           "@type": "Person",
           "name": NAME_EN,
           "alternateName": NAME_FA,
-          "description": `${NAME_EN} is a young child, currently busy growing up and exploring the world. This is his placeholder website.`,
+          "description": `${NAME_EN} website.`,
           "url": "https://radvinpakravan.ir"
         };
         const oldLd = document.querySelector('script[type="application/ld+json"]');
@@ -366,22 +350,6 @@ h1 {
         ldScript.textContent = JSON.stringify(ldJson);
         document.head.appendChild(ldScript);
 
-        // Build skill bars
-        const skillsContainer = document.getElementById('skillsContainer');
-        skills.forEach(skill => {
-          const item = document.createElement('div');
-          item.className = 'skill-item';
-          item.innerHTML = `
-                <div class="skill-header">
-                    <span>${skill.emoji} ${skill.label}</span>
-                    <span>${skill.percent}%</span>
-                </div>
-                <div class="skill-bar">
-                    <div class="skill-fill" style="--fill:${skill.percent}%; width:${skill.percent}%"></div>
-                </div>
-            `;
-          // skillsContainer.appendChild(item);
-        });
 
         // Generate stars
         function createStars() {
